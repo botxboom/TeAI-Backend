@@ -44,7 +44,7 @@
       }
       .header {
         width: 100vw;
-        height: 50px;
+        height: 70px;
         background-color: rgb(228, 228, 228);
         display: flex;
         align-items: center;
@@ -65,11 +65,22 @@
   </head>
   <body>
     <div class="header">
-      <div class="nav-header">
+      <div
+        class="nav-header"
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 5px;
+        "
+      >
         <img
-          src="https://assets.devrel.in/content/1fffc06858624722919d45e8a1c48701/884aeb36-0d60-4dea-a170-6d063a51e05f.png"
-          alt="image"
+          src="{{ url_for('static', filename='creative.png') }}"
+          width="50"
+          height="50"
+          alt="RAG Logo"
         />
+        <h2>TeachAI</h2>
       </div>
       <a
         href="/upload-pdf"

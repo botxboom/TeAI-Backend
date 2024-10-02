@@ -65,22 +65,24 @@
   </head>
   <body>
     <div class="header">
-      <div
-        class="nav-header"
-        style="
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 5px;
-        "
-      >
-        <img
-          src="{{ url_for('static', filename='creative.png') }}"
-          width="50"
-          height="50"
-          alt="RAG Logo"
-        />
-        <h2>TeachAI</h2>
+      <div class="nav-header">
+        <a
+          href="/"
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+          "
+        >
+          <img
+            src="{{ url_for('static', filename='creative.png') }}"
+            width="50"
+            height="50"
+            alt="RAG Logo"
+          />
+          <h2>TeachAI</h2>
+        </a>
       </div>
       <a
         href="/upload-pdf"

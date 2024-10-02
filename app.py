@@ -55,13 +55,9 @@ def document():
         splitter = RecursiveCharacterTextSplitter(chunk_size = 1000, chunk_overlap = 200)
         documents = splitter.split_documents(doc)
 
-        print(documents[:5])
-
-
         embedding = OllamaEmbeddings(model = 'gemma2:2b')
         db = FAISS.from_documents(documents,embedding)
         __retriever = db.as_retriever()
-        print('Embeddings generated')
         
     return Response(status=204)
 
@@ -71,7 +67,6 @@ def prompt():
     global __text
     user_prompt = request.get_json()
     __text = user_prompt['text']
-    print(__text)
 
     return Response(status=204)
     
@@ -84,6 +79,7 @@ def chatbot():
     input = user_input['text']
     llm = Ollama(model = "gemma2:2b")
     output_parser = StrOutputParser()
+    history = memory.load_memory_variables({}).get('history', '')
 
 
     if __retriever:
@@ -91,15 +87,16 @@ def chatbot():
         
         doc_chain = create_stuff_documents_chain(llm,prompt)
         retrieval_chain =  create_retrieval_chain(__retriever, doc_chain)
-        result = retrieval_chain.invoke({"input":input,"text":__text, "history": memory.load_memory_variables({})['history']})
+        result = retrieval_chain.invoke({"input":input,"text":__text, "history": history})
         response = result['answer']
-        memory.save_context({'input':input} , {'output': response})
+        
     else:
         prompt = ChatPromptTemplate.from_template("Prompt: {text} Input: {input} History Summary: {history}.")
 
         chain = prompt | llm | output_parser
-        response = chain.invoke({"input":input,"text":__text, "history": memory.load_memory_variables({})['history']})
-        memory.save_context({'input':input} , {'output': response})
+        response = chain.invoke({"input":input,"text":__text, "history": history})
+
+    memory.save_context({'input': input}, {'output': response})
 
 
     return jsonify({"response":response})

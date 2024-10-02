@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload PDF & Submit Prompt</title>
+    <!-- Bootstrap CSS for styling (optional) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script>
+        // JavaScript to handle form submission for file upload
+        function submitFileForm() {
+            const fileInput = document.getElementById('file');
+            if (fileInput.files.length === 0) {
+                alert("Please select a file before submitting.");
+                return false;  // Prevent form submission if no file is selected
+            }
+            return true;  // Allow form submission if a file is selected
+        }
+
+        // JavaScript to handle form submission for prompt input
+        async function submitPromptForm(event) {
+            event.preventDefault(); // Prevent the default form submission
+            
+            const promptInput = document.getElementById('prompt');
+            const prompt = promptInput.value.trim();
+
+            if (prompt === "") {
+                alert("Please enter a prompt before submitting.");
+                return false;  // Prevent submission if no prompt is entered
+            }
+
+            // Prepare the JSON data to be sent
+            const data = { text: prompt };
+
+            try {
+                const response = await fetch('/prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json', // Set the correct content type
+                    },
+                    body: JSON.stringify(data), // Convert the data to JSON
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const responseData = await response.json();
+                console.log(responseData); // Handle the response as needed
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Function to redirect to chat page
+        function goToChat() {
+            window.location.href = '/chat'; // Redirect to chat.html
+        }
+    </script>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2 class="text-center">Upload a PDF Document & Enter a Prompt</h2>
+
+    <!-- Form to upload PDF file -->
+    <form id="uploadForm" action="/document" method="POST" enctype="multipart/form-data" class="mt-4" onsubmit="return submitFileForm()">
+        <div class="form-group">
+            <label for="file">Choose PDF file (optional):</label>
+            <input type="file" name="file" id="file" class="form-control" accept=".pdf">
+        </div>
+        <button type="submit" class="btn btn-primary">Upload PDF</button>
+    </form>
+
+    <!-- Form to submit prompt -->
+    <form id="promptForm" class="mt-4" onsubmit="submitPromptForm(event)">
+        <div class="form-group">
+            <label for="prompt">Enter your prompt:</label>
+            <input type="text" name="prompt" id="prompt" class="form-control" placeholder="Type your prompt here...">
+        </div>
+        <button type="submit" class="btn btn-success">Submit Prompt</button>
+    </form>
+
+    <!-- Chat button to redirect to chat.html -->
+    <div class="mt-4">
+        <button class="btn btn-info" onclick="goToChat()">Chat with LLM</button>
+    </div>
+
+    <!-- Area to display flashed messages (error or success) -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-warning mt-4" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</div>
+
+</body>
+</html>
